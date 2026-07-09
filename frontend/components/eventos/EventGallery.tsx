@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { isLocalEventoImage, normalizeEventoImageUrl } from "@/lib/evento-images";
 
 type EventGalleryProps = {
   fotos: string[];
@@ -46,7 +47,9 @@ export function EventGallery({ fotos, eventoNome }: EventGalleryProps) {
   return (
     <>
       <div className="columns-2 sm:columns-3 gap-4 [column-fill:_balance]">
-        {fotos.map((foto, i) => (
+        {fotos.map((foto, i) => {
+          const src = normalizeEventoImageUrl(foto);
+          return (
           <button
             key={foto + i}
             type="button"
@@ -55,15 +58,17 @@ export function EventGallery({ fotos, eventoNome }: EventGalleryProps) {
             aria-label={`Ampliar foto ${i + 1} do evento ${eventoNome}`}
           >
             <Image
-              src={foto}
+              src={src}
               alt={`Foto ${i + 1} do evento ${eventoNome}`}
               width={500}
               height={i % 2 === 0 ? 650 : 400}
               sizes="(min-width: 640px) 33vw, 50vw"
               className="w-full h-auto object-cover"
+              unoptimized={isLocalEventoImage(src)}
             />
           </button>
-        ))}
+        );
+        })}
       </div>
 
       <AnimatePresence>
@@ -122,13 +127,16 @@ export function EventGallery({ fotos, eventoNome }: EventGalleryProps) {
               onClick={(e) => e.stopPropagation()}
             >
               <Image
-                src={fotos[selectedIndex]}
+                src={normalizeEventoImageUrl(fotos[selectedIndex])}
                 alt={`Foto ${selectedIndex + 1} do evento ${eventoNome}`}
                 width={1600}
                 height={1200}
                 sizes="100vw"
                 className="w-full h-auto max-h-[90vh] object-contain rounded-xl2"
                 priority
+                unoptimized={isLocalEventoImage(
+                  normalizeEventoImageUrl(fotos[selectedIndex]),
+                )}
               />
             </motion.div>
           </motion.div>

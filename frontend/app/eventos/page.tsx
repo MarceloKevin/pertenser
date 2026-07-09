@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
@@ -7,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Card } from "@/components/ui/Card";
+import { EventImage } from "@/components/eventos/EventImage";
 import { fetchEventosRealizados } from "@/lib/events";
 
 export const metadata: Metadata = {
@@ -50,7 +50,7 @@ export default async function EventosPage() {
                 className="h-full flex flex-col overflow-hidden group"
               >
                 <div className="relative h-48 overflow-hidden">
-                  <Image
+                  <EventImage
                     src={evento.imagemDestaque}
                     alt={evento.nome}
                     fill

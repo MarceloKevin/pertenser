@@ -13,7 +13,7 @@ async function main() {
   await prisma.user.upsert({
     where: { email: adminEmail },
     create: { email: adminEmail, password: hashedPassword },
-    update: {},
+    update: { password: hashedPassword },
   });
 
   await prisma.generalInfo.upsert({
@@ -142,7 +142,7 @@ async function main() {
           "Dinâmica 'Cartas para o meu recomeço'",
           "Encerramento com troca de abraços e contatos",
         ],
-        imagemDestaque: "/uploads/eventos/encontro-de-recomecos/destaque.jpg",
+        imagemDestaque: "/eventos/encontro-de-recomecos/destaque.jpg",
         galeria: [],
         depoimentos: {
           create: [
@@ -186,7 +186,7 @@ async function main() {
           "Dinâmica dos pares silenciosos",
           "Roda de agradecimentos ao final do dia",
         ],
-        imagemDestaque: "/uploads/eventos/roda-de-conexoes/destaque.jpg",
+        imagemDestaque: "/eventos/roda-de-conexoes/destaque.jpg",
         galeria: [],
         depoimentos: {
           create: [
@@ -198,6 +198,28 @@ async function main() {
         },
       },
     });
+  }
+
+  const eventosLegados = await prisma.eventoRealizado.findMany();
+  for (const evento of eventosLegados) {
+    const imagemDestaque = evento.imagemDestaque.startsWith("/uploads/eventos/")
+      ? evento.imagemDestaque.replace("/uploads/eventos/", "/eventos/")
+      : evento.imagemDestaque;
+    const galeria = evento.galeria.map((url) =>
+      url.startsWith("/uploads/eventos/")
+        ? url.replace("/uploads/eventos/", "/eventos/")
+        : url,
+    );
+
+    if (
+      imagemDestaque !== evento.imagemDestaque ||
+      galeria.some((url, index) => url !== evento.galeria[index])
+    ) {
+      await prisma.eventoRealizado.update({
+        where: { id: evento.id },
+        data: { imagemDestaque, galeria },
+      });
+    }
   }
 
   console.log("Seed concluído com sucesso.");

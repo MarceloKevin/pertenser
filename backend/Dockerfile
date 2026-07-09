@@ -24,7 +24,7 @@ RUN apk add --no-cache openssl
 COPY package.json package-lock.json ./
 COPY prisma ./prisma/
 
-RUN npm ci --omit=dev && npm install prisma@^6.9.0 --no-save
+RUN npm ci --omit=dev && npm install prisma@^6.9.0 tsx@^4.20.3 --no-save
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma

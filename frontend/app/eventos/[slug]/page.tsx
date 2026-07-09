@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, CalendarDays, Target, Sparkles } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/layout/Container";
 import { EventGallery } from "@/components/eventos/EventGallery";
+import { EventImage } from "@/components/eventos/EventImage";
 import { EventVideos } from "@/components/eventos/EventVideos";
 import { fetchEventoBySlug, fetchEventosRealizados } from "@/lib/events";
+import { normalizeEventoImageUrl } from "@/lib/evento-images";
 
 export async function generateStaticParams() {
   const eventos = await fetchEventosRealizados();
@@ -30,7 +31,7 @@ export async function generateMetadata({
     openGraph: {
       title: evento.nome,
       description: evento.resumo,
-      images: [{ url: evento.imagemDestaque }],
+      images: [{ url: normalizeEventoImageUrl(evento.imagemDestaque) }],
     },
   };
 }
@@ -68,7 +69,7 @@ export default async function EventoPage({
           </h1>
 
           <div className="relative aspect-[16/9] rounded-xl2 overflow-hidden shadow-soft mb-10">
-            <Image
+            <EventImage
               src={evento.imagemDestaque}
               alt={evento.nome}
               fill

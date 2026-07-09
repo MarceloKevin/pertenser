@@ -50,6 +50,13 @@ type EventoWithRelations = {
   videos: { titulo: string; url: string; ordem: number }[];
 };
 
+function normalizeEventoImageUrl(url: string): string {
+  if (url.startsWith("/uploads/eventos/")) {
+    return url.replace("/uploads/eventos/", "/eventos/");
+  }
+  return url;
+}
+
 function formatEvento(evento: EventoWithRelations) {
   return {
     slug: evento.slug,
@@ -60,8 +67,8 @@ function formatEvento(evento: EventoWithRelations) {
     descricaoCompleta: evento.descricaoCompleta,
     objetivo: evento.objetivo,
     momentosMarcantes: evento.momentosMarcantes,
-    imagemDestaque: evento.imagemDestaque,
-    galeria: evento.galeria,
+    imagemDestaque: normalizeEventoImageUrl(evento.imagemDestaque),
+    galeria: evento.galeria.map(normalizeEventoImageUrl),
     depoimentos: evento.depoimentos.map((d) => ({
       nome: d.nome,
       texto: d.texto,

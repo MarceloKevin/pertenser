@@ -24,6 +24,8 @@ export type EventoRealizado = {
   videos: VideoEvento[];
 };
 
+import { normalizeEventoImageUrl } from "./evento-images";
+
 export type ProximoEvento = {
   nome: string;
   descricao: string;
@@ -45,8 +47,8 @@ function mapEventoRealizado(item: Partial<EventoRealizado>): EventoRealizado {
     descricaoCompleta: item.descricaoCompleta ?? "",
     objetivo: item.objetivo ?? "",
     momentosMarcantes: item.momentosMarcantes ?? [],
-    imagemDestaque: item.imagemDestaque ?? "",
-    galeria: item.galeria ?? [],
+    imagemDestaque: normalizeEventoImageUrl(item.imagemDestaque ?? ""),
+    galeria: (item.galeria ?? []).map(normalizeEventoImageUrl),
     depoimentos: item.depoimentos ?? [],
     videos: item.videos ?? [],
   };

@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { EventImage } from "@/components/eventos/EventImage";
 import { type EventoRealizado } from "@/lib/events";
 
 type EventsProps = {
@@ -41,7 +41,7 @@ export function Events({ eventos }: EventsProps) {
             >
               <Card className="h-full flex flex-col overflow-hidden group">
                 <div className="relative h-48 overflow-hidden">
-                  <Image
+                  <EventImage
                     src={evento.imagemDestaque}
                     alt={evento.nome}
                     fill
