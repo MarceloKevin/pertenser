@@ -80,8 +80,8 @@ services:
     container_name: pertenser-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "${NGINX_HTTP_PORT:-8080}:80"
+      - "${NGINX_HTTPS_PORT:-8443}:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
@@ -120,6 +120,8 @@ if [ ! -f "${APP_DIR}/.env" ]; then
 DOMAIN=www.pertenser.com.br
 DOMAIN_ALT=pertenser.com.br
 FRONTEND_URL=https://www.pertenser.com.br
+NGINX_HTTP_PORT=8080
+NGINX_HTTPS_PORT=8443
 CERTBOT_EMAIL=admin@pertenser.com.br
 POSTGRES_PASSWORD=troque-por-uma-senha-forte-aqui
 JWT_SECRET=troque-por-um-secret-forte-aqui

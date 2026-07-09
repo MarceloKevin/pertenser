@@ -30,8 +30,8 @@ mkdir -p "${APP_DIR}"/{backend,frontend,nginx/conf.d,certbot/conf,certbot/www,sc
 
 echo "==> Configurando firewall (UFW)..."
 ufw allow OpenSSH
-ufw allow 80/tcp
-ufw allow 443/tcp
+ufw allow 8080/tcp
+ufw allow 8443/tcp
 ufw --force enable
 
 echo "==> Estrutura criada. Próximos passos:"
