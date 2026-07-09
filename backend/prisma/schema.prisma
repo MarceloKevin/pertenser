@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Autenticação ───────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Informações gerais (contato e redes sociais) ───────────────────────────
+
+model GeneralInfo {
+  id        String   @id @default("singleton")
+  whatsapp  String   @default("")
+  email     String   @default("")
+  instagram String   @default("")
+  facebook  String   @default("")
+  youtube   String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Próximo evento (singleton) ─────────────────────────────────────────────
+
+model ProximoEvento {
+  id        String   @id @default("singleton")
+  ativo     Boolean  @default(false)
+  nome      String   @default("")
+  descricao String   @default("")
+  local     String   @default("")
+  data      String   @default("")
+  horario   String   @default("")
+  imagem    String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Eventos realizados ─────────────────────────────────────────────────────
+
+model EventoRealizado {
+  id                 String       @id @default(cuid())
+  slug               String       @unique
+  nome               String
+  data               String
+  dataFormatada      String
+  resumo             String       @default("")
+  descricaoCompleta  String       @default("") @db.Text
+  objetivo           String       @default("") @db.Text
+  momentosMarcantes  String[]     @default([])
+  imagemDestaque     String       @default("")
+  galeria            String[]       @default([])
+  depoimentos        Depoimento[]
+  videos             VideosEvento[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+}
+
+model Depoimento {
+  id       String          @id @default(cuid())
+  nome     String
+  texto    String          @db.Text
+  evento   EventoRealizado @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  eventoId String
+}
+
+model VideosEvento {
+  id       String          @id @default(cuid())
+  titulo   String          @default("")
+  url      String
+  ordem    Int             @default(0)
+  evento   EventoRealizado @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  eventoId String
+}
+
+// ─── Dúvidas frequentes ─────────────────────────────────────────────────────
+
+model Duvida {
+  id        String   @id @default(cuid())
+  pergunta  String
+  resposta  String   @db.Text
+  ordem     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Nossa história ───────────────────────────────────────────────────────────
+
+model Historia {
+  id            String   @id @default("singleton")
+  titulo        String   @default("")
+  primeiraParte String   @default("") @db.Text
+  segundaParte  String   @default("") @db.Text
+  updatedAt     DateTime @updatedAt
+}
+
+model Objetivo {
+  id        String   @id @default(cuid())
+  titulo    String
+  texto     String   @db.Text
+  icon      String   @default("heart-handshake")
+  ordem     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

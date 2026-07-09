@@ -1,0 +1,19 @@
+# Variáveis de ambiente (secrets)
+.env
+.env.local
+.env.production
+
+# Certificados SSL (Let's Encrypt)
+certbot/conf/
+certbot/www/
+
+# Config nginx gerada no servidor (a partir do template)
+nginx/conf.d/pertenser-ssl.conf
+
+# Backups e logs
+backups/
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
