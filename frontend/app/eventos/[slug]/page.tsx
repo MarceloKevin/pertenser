@@ -8,13 +8,10 @@ import { Container } from "@/components/layout/Container";
 import { EventGallery } from "@/components/eventos/EventGallery";
 import { EventImage } from "@/components/eventos/EventImage";
 import { EventVideos } from "@/components/eventos/EventVideos";
-import { fetchEventoBySlug, fetchEventosRealizados } from "@/lib/events";
+import { fetchEventoBySlug } from "@/lib/events";
 import { normalizeEventoImageUrl } from "@/lib/evento-images";
 
-export async function generateStaticParams() {
-  const eventos = await fetchEventosRealizados();
-  return eventos.map((evento) => ({ slug: evento.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
