@@ -70,6 +70,8 @@ services:
     environment:
       BACKEND_URL: http://pertenser-api:4000
       NODE_ENV: production
+    ports:
+      - "127.0.0.1:3000:3000"
     volumes:
       - eventos_uploads:/app/public/eventos
     networks:

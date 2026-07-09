@@ -63,6 +63,9 @@ services:
     environment:
       BACKEND_URL: http://pertenser-api:4000
       NODE_ENV: production
+    ports:
+      # Expõe só no localhost para o nginx do host (VPS compartilhada)
+      - "127.0.0.1:3000:3000"
     volumes:
       - eventos_uploads:/app/public/eventos
     networks:
