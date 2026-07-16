@@ -856,7 +856,7 @@ function EventoEditModal({
                               onChange={(e) =>
                                 updateVideo(index, "url", e.target.value)
                               }
-                              placeholder="URL"
+                              placeholder="Link do vídeo (YouTube, Instagram, Vimeo...)"
                               className={inputClasses}
                             />
                             <input
@@ -1037,6 +1037,42 @@ export function PastEventsSection() {
     [],
   );
 
+  const handleDelete = useCallback(async (evento: EventoRealizado) => {
+    if (
+      !window.confirm(
+        `Deseja excluir o evento "${evento.nome}"? Esta ação não pode ser desfeita.`,
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const token = getAuthToken();
+      const response = await fetch(`/api/eventos/${evento.slug}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = (await response.json()) as EventosResponse;
+        throw new Error(data.error ?? "Não foi possível excluir o evento.");
+      }
+
+      setEventos((prev) => prev.filter((item) => item.slug !== evento.slug));
+      setEditingEvento((current) =>
+        current?.slug === evento.slug ? null : current,
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Não foi possível excluir o evento.",
+      );
+    }
+  }, []);
+
   return (
     <section
       id="eventos-realizados"
@@ -1116,6 +1152,14 @@ export function PastEventsSection() {
                         className="px-4 py-2 text-xs"
                       >
                         Visualizar evento
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="px-4 py-2 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => handleDelete(evento)}
+                      >
+                        Excluir evento
                       </Button>
                     </div>
                   </td>

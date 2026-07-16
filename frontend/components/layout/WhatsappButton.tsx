@@ -1,11 +1,13 @@
-"use client";
-
 import { MessageCircle } from "lucide-react";
+import { fetchGeneralInfo, whatsappMeUrl } from "@/lib/general-info";
 
-export function WhatsappButton() {
+export async function WhatsappButton() {
+  const info = await fetchGeneralInfo();
+  const href = whatsappMeUrl(info.whatsapp);
+
   return (
     <a
-      href="https://wa.me/5500000000000"
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar com o PertenSer no WhatsApp"

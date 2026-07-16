@@ -52,3 +52,30 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     );
   }
 }
+
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  try {
+    const { slug } = await context.params;
+    const authorization = request.headers.get("authorization");
+
+    const response = await fetch(`${BACKEND_URL}/api/eventos/${slug}`, {
+      method: "DELETE",
+      headers: {
+        ...(authorization ? { Authorization: authorization } : {}),
+      },
+    });
+
+    if (response.status === 204) {
+      return new NextResponse(null, { status: 204 });
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
+  } catch (error) {
+    console.error("Evento DELETE proxy error:", error);
+    return NextResponse.json(
+      { error: "Não foi possível conectar ao servidor." },
+      { status: 502 },
+    );
+  }
+}

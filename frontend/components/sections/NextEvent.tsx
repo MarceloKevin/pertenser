@@ -8,6 +8,7 @@ import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { type ProximoEvento } from "@/lib/events";
+import { isLocalEventoImage, normalizeEventoImageUrl } from "@/lib/evento-images";
 
 type NextEventProps = {
   evento: ProximoEvento;
@@ -37,11 +38,14 @@ export function NextEvent({ evento }: NextEventProps) {
               <div className="grid md:grid-cols-2">
                 <div className="relative h-64 md:h-full">
                   <Image
-                    src={evento.imagem}
+                    src={normalizeEventoImageUrl(evento.imagem)}
                     alt={evento.nome}
                     fill
                     sizes="(min-width: 768px) 50vw, 100vw"
                     className="object-cover"
+                    unoptimized={isLocalEventoImage(
+                      normalizeEventoImageUrl(evento.imagem),
+                    )}
                   />
                 </div>
                 <div className="flex flex-col gap-5 p-8 sm:p-10">

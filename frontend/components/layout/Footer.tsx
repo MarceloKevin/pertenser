@@ -1,5 +1,6 @@
 import { Instagram, Facebook, MessageCircle, Mail } from "lucide-react";
 import { Container } from "./Container";
+import { fetchGeneralInfo, whatsappMeUrl } from "@/lib/general-info";
 
 const LINKS_RAPIDOS = [
   { label: "Início", href: "#inicio" },
@@ -9,8 +10,10 @@ const LINKS_RAPIDOS = [
   { label: "Dúvidas", href: "#duvidas" },
 ];
 
-export function Footer() {
+export async function Footer() {
   const ano = new Date().getFullYear();
+  const info = await fetchGeneralInfo();
+  const whatsappHref = whatsappMeUrl(info.whatsapp);
 
   return (
     <footer id="contato" className="bg-ink text-white">
@@ -51,14 +54,14 @@ export function Footer() {
               Contato
             </span>
             <a
-              href="mailto:contato@pertenser.com.br"
+              href={`mailto:${info.email}`}
               className="flex items-center gap-2 text-sm text-white/70 hover:text-blush-300 transition-colors w-fit"
             >
               <Mail size={16} />
-              contato@pertenser.com.br
+              {info.email}
             </a>
             <a
-              href="https://wa.me/5500000000000"
+              href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-white/70 hover:text-blush-300 transition-colors w-fit"
@@ -69,7 +72,7 @@ export function Footer() {
             </a>
             <div className="flex items-center gap-4 pt-2">
               <a
-                href="https://www.instagram.com/pertenser"
+                href={info.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram do PertenSer"
@@ -78,7 +81,7 @@ export function Footer() {
                 <Instagram size={20} />
               </a>
               <a
-                href="https://www.facebook.com/pertenser"
+                href={info.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook do PertenSer"

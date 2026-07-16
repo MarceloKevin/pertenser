@@ -1,11 +1,14 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import { Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Toggle } from "@/components/ui/Toggle";
 import { inputClasses } from "./inputStyles";
+
+const PROXIMO_EVENTO_UPLOAD_SLUG = "proximo-evento";
 
 type ProximoEventoForm = {
   ativo: boolean;
@@ -49,8 +52,11 @@ export function NextEventSection() {
   const [form, setForm] = useState<ProximoEventoForm>(EMPTY_FORM);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,6 +127,13 @@ export function NextEventSection() {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setUploadError("");
+
+    if (!form.imagem.trim()) {
+      setUploadError("Envie uma foto do evento antes de salvar.");
+      return;
+    }
+
     setIsSaving(true);
 
     const token = localStorage.getItem("token");
@@ -176,6 +189,46 @@ export function NextEventSection() {
   ) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setSuccess("");
+  };
+
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setUploading(true);
+    setUploadError("");
+    setSuccess("");
+
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      body.append("slug", PROXIMO_EVENTO_UPLOAD_SLUG);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body,
+      });
+
+      const data = (await response.json()) as { url?: string; error?: string };
+
+      if (!response.ok || !data.url) {
+        throw new Error(data.error ?? "Erro ao fazer upload.");
+      }
+
+      update("imagem", data.url);
+    } catch (err) {
+      setUploadError(
+        err instanceof Error ? err.message : "Erro ao fazer upload.",
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    update("imagem", "");
+    setUploadError("");
   };
 
   return (
@@ -291,29 +344,57 @@ export function NextEventSection() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label htmlFor="imagem" className="text-sm font-medium text-ink">
-                Foto do evento
-              </label>
+            <div className="flex flex-col gap-3">
+              <span className="text-sm font-medium text-ink">Foto do evento</span>
+
               <input
-                id="imagem"
-                name="imagem"
-                type="url"
-                value={form.imagem}
-                onChange={(e) => update("imagem", e.target.value)}
-                placeholder="https://exemplo.com/foto-do-evento.jpg"
-                className={inputClasses}
-                required
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={handleImageUpload}
               />
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="w-fit px-4 py-2 text-xs"
+                  disabled={uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload size={16} />
+                  {uploading
+                    ? "Enviando…"
+                    : form.imagem.trim()
+                      ? "Trocar foto"
+                      : "Upload da foto"}
+                </Button>
+
+                {form.imagem.trim() ? (
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 size={14} />
+                    Remover
+                  </button>
+                ) : null}
+              </div>
+
               <p className="text-xs text-stone">
-                Cole a URL da imagem ou o caminho de um arquivo em{" "}
-                <code className="rounded bg-mist px-1.5 py-0.5 text-stone-dark">
-                  /public
-                </code>
-                .
+                Formatos: JPG, PNG, WebP ou GIF. Máximo: 5 MB.
               </p>
-              {form.imagem.trim() && (
-                <div className="relative mt-2 h-48 w-full overflow-hidden rounded-xl2 border border-cloud bg-mist sm:h-56">
+
+              {uploadError ? (
+                <p className="text-xs text-red-600" role="alert">
+                  {uploadError}
+                </p>
+              ) : null}
+
+              {form.imagem.trim() ? (
+                <div className="relative mt-1 h-48 w-full overflow-hidden rounded-xl2 border border-cloud bg-mist sm:h-56">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={form.imagem}
@@ -323,6 +404,10 @@ export function NextEventSection() {
                       e.currentTarget.style.display = "none";
                     }}
                   />
+                </div>
+              ) : (
+                <div className="flex h-40 items-center justify-center rounded-xl2 border border-dashed border-cloud bg-mist/40 px-4 text-center text-sm text-stone">
+                  Nenhuma foto enviada ainda.
                 </div>
               )}
             </div>
@@ -339,7 +424,7 @@ export function NextEventSection() {
               </p>
             ) : null}
 
-            <Button type="submit" className="w-fit" disabled={isSaving}>
+            <Button type="submit" className="w-fit" disabled={isSaving || uploading}>
               {isSaving ? "Salvando..." : "Salvar próximo evento"}
             </Button>
           </form>
